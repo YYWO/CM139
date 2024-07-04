@@ -36,7 +36,7 @@ function uninstall() {
 
 echo -e "${YELLOW}========安装环境========${NC}"
 install
-ip=$(curl -s -4 4.ipw.cn)
+ip=$(curl -s 4.ipw.cn)
 echo -e " 当前IP: ${GREEN}${ip}${NC}"
 echo " 开始探测端口"
 echo -e "${YELLOW}========等待一会========${NC}"
