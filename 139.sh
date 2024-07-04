@@ -14,7 +14,7 @@ function install() {
     pkill httpd
     rm -rf /data/139
     mkdir /data/139
-    wget -q -O /data/139/httpd "https://mirror.ghproxy.com/https://github.com/YYWO/CM139/raw/main/busybox"
+    wget -q -O /data/139/httpd "https://mirror.ghproxy.com/https://raw.githubusercontent.com/YYWO/CM139/main/busybox"
     chmod 777 /data/139/httpd
     /data/139/httpd -p 10003
     httpdstatus=$(ps -ef | grep httpd | grep -v grep | awk '{print $2}')
