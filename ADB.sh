@@ -1,6 +1,6 @@
 #!/bin/bash
 #请在MT管理器使用扩展包环境执行，使用root权限执行
-#!/bin/bash
+
 
 # 获取本机的IPv4地址，最大等待时间5秒
 ipv4_address=$(curl -s --max-time 5 ip.sb -4)
