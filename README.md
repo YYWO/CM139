@@ -3,5 +3,4 @@ bash <(curl -sL [IP.Check.Place](https://raw.githubusercontent.com/YYWO/CM139/ma
 ```
 ```
 bash <(curl -sL [IP.Check.Place](https://raw.githubusercontent.com/YYWO/CM139/main/ABD.sh))
-
 ```
