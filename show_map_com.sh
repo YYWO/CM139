@@ -1,4 +1,4 @@
-、#!/bin/bash
+#!/bin/bash
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")") # 获取当前路径
 export LD_LIBRARY_PATH=$SCRIPT_DIR/../lib:${LD_LIBRARY_PATH:-}
