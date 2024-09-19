@@ -73,10 +73,10 @@ get_n_com() {
     done
 
     # 输出解析结果到日志
-    $echo_cmd -e "云手机ip: ${n_external_address}\nIPv6地址: ${n_ipv6_address}\n\n端口映射及占用情况:\n${port_mapping_info}\n-------检-测-时-间-------\n$(date "+%Y-%m-%d %H:%M:%S")" >>"$INPUT_LOG"
+    $echo_cmd -e "云手机ip: ${n_external_address}\nIPv6地址: ${n_ipv6_address}\n端口映射及占用情况:\n${port_mapping_info}\n-------检-测-时-间-------\n$(date "+%Y-%m-%d %H:%M:%S")" >>"$INPUT_LOG"
     
     # 保存端口映射信息到文件
-    echo -e "云手机ip: ${n_external_address}\nIPv6地址: ${n_ipv6_address}\n\n端口映射及占用情况:\n${port_mapping_info}\n\n-------检-测-时-间-------\n$(date "+%Y-%m-%d %H:%M:%S")" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
+    echo -e "云手机ip: ${n_external_address}\nIPv6地址: ${n_ipv6_address}\n端口映射及占用情况:\n${port_mapping_info}\n-------检-测-时-间-------\n$(date "+%Y-%m-%d %H:%M:%S")" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
     
     # 显示保存成功的信息
     $echo_cmd -e "${green}更多端口映射关系已保存到 ${yellow}$(dirname "$SCRIPT_DIR")/端口映射关系.txt ${green}中${nc}"
@@ -110,7 +110,7 @@ get_u_com() {
     done
     
     # 输出解析结果到日志
-    echo -e "云手机ip: ${u_external_address}\nIPv6地址: ${u_ipv6_address}\n\n端口映射及占用情况:\n${port_mapping_info}\n\n-------检-测-时-间-------\n$(date "+%Y-%m-%d %H:%M:%S")" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
+    echo -e "云手机ip: ${u_external_address}\nIPv6地址: ${u_ipv6_address}\n端口映射及占用情况:\n${port_mapping_info}\n-------检-测-时-间-------\n$(date "+%Y-%m-%d %H:%M:%S")" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
     
     $echo_cmd -e "${green}更多端口映射关系已保存到 ${yellow}$(dirname "$SCRIPT_DIR")/端口映射关系.txt ${green}中${nc}"
 }
