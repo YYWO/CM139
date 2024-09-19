@@ -49,4 +49,3 @@ done
 # 记录当前检测时间
 echo "-------检-测-时-间-------" >> /storage/emulated/0/Download/端口映射.txt
 date "+%Y-%m-%d %H:%M:%S" >> /storage/emulated/0/Download/端口映射.txt
-echo "--------------------------------" > /storage/emulated/0/Download/端口映射.txt
