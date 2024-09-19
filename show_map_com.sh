@@ -44,7 +44,7 @@ get_n_com() {
     $echo_cmd -e "n_external_address:\n$n_external_address\nexternal_aport:\n$n_external_aport" >>"$INPUT_LOG"
     
     # 保存端口映射信息到文件
-    echo -e "云手机ip:\t$n_external_address\n内网端口:\t10000\t=====>\t公网端口:\t$n_external_aport\n内网端口:\t10001\t=====>\t公网端口:\t$((n_external_aport + 1))\n内网端口:\t10002\t=====>\t公网端口:\t$((n_external_aport + 2))\n内网端口:\t10003\t=====>\t公网端口:\t$((n_external_aport + 3))\n内网端口:\t10004\t=====>\t公网端口:\t$((n_external_aport + 4))" | tee "$SCRIPT_DIR/../端口映射关系.txt" | tee -a "$INPUT_LOG"
+    echo -e "云手机ip:\t$n_external_address\n内网端口:\t10000\t=====>\t公网端口:\t$n_external_aport\n内网端口:\t10001\t=====>\t公网端口:\t$((n_external_aport + 1))\n内网端口:\t10002\t=====>\t公网端口:\t$((n_external_aport + 2))\n内网端口:\t10003\t=====>\t公网端口:\t$((n_external_aport + 3))\n内网端口:\t10004\t=====>\t公网端口:\t$((n_external_aport + 4))" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
     
     # 显示保存成功的信息
     $echo_cmd -e "${green}更多端口映射关系已保存到 ${yellow}$(dirname "$SCRIPT_DIR")/端口映射关系.txt ${green}中${nc}"
