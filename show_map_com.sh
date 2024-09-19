@@ -11,6 +11,28 @@ green="\033[32m"  # 设置绿色字体
 yellow="\033[33m" # 设置黄色字体
 nc="\033[0m"      # 重置颜色
 
+# 获取 IPv6 地址的函数
+get_ipv6_address() {
+    ipv6_address=$(curl -s 6.ipw.cn)
+    if [ -z "$ipv6_address" ]; then
+        $echo_cmd -e "${yellow}未能获取 IPv6 地址${nc}" >>"$INPUT_LOG"
+        ipv6_address="未获取到"
+    fi
+    echo "$ipv6_address"
+}
+
+# 获取端口占用情况的函数
+get_port_occupation() {
+    local base_port=$1
+    local port_occupation=$(netstat -tlnp 2>/dev/null | grep ":$base_port")
+    if [ -n "$port_occupation" ]; then
+        local process=$(echo "$port_occupation" | awk '{sub(/[0-9]+\//, "", $NF); print $NF; exit}')
+        echo "被进程 $process 占用"
+    else
+        echo "未被占用"
+    fi
+}
+
 # 函数:根据脚本运行环境选择获取端口的方法
 detect_method_get_external_com() {
     n_file="/data/local/qcom/log/boxotaLog.txt" # 移动云手机(n:normal)
@@ -33,17 +55,28 @@ get_n_com() {
     n_external_address=$(echo "$result" | awk -F'"address":"' '{print $2}' | awk -F'"' '{print $1}')
     n_external_aport=$(echo "$result" | awk -F'"aport":' '{print $2}')
     
+    # 获取 IPv6 地址
+    n_ipv6_address=$(get_ipv6_address)
+    
     # 检查是否成功提取到正确的 IP 和端口
     if [ -z "$n_external_address" ] || [ -z "$n_external_aport" ]; then
         $echo_cmd -e "${yellow}未找到正确的公网 IP 或端口，请检查日志文件格式${nc}" >>"$INPUT_LOG"
         exit 1
     fi
 
+    # 记录端口映射及占用情况
+    port_mapping_info=""
+    for i in {0..4}; do
+        base_port=$((10000 + i))
+        port_status=$(get_port_occupation $base_port)
+        port_mapping_info+="内网端口:\t$base_port\t=====>\t公网端口:\t$((n_external_aport + i)) $port_status\n"
+    done
+
     # 输出解析结果到日志
-    $echo_cmd -e "n_external_address:\n$n_external_address\nexternal_aport:\n$n_external_aport" >>"$INPUT_LOG"
+    $echo_cmd -e "云手机ip:\t$n_external_address\nIPv6地址:\t$n_ipv6_address\n端口映射及占用情况:\n$port_mapping_info" >>"$INPUT_LOG"
     
     # 保存端口映射信息到文件
-    echo -e "云手机ip:\t$n_external_address\n内网端口:\t10000\t=====>\t公网端口:\t$n_external_aport\n内网端口:\t10001\t=====>\t公网端口:\t$((n_external_aport + 1))\n内网端口:\t10002\t=====>\t公网端口:\t$((n_external_aport + 2))\n内网端口:\t10003\t=====>\t公网端口:\t$((n_external_aport + 3))\n内网端口:\t10004\t=====>\t公网端口:\t$((n_external_aport + 4))" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
+    echo -e "云手机ip:\t$n_external_address\nIPv6地址:\t$n_ipv6_address\n$port_mapping_info" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
     
     # 显示保存成功的信息
     $echo_cmd -e "${green}更多端口映射关系已保存到 ${yellow}$(dirname "$SCRIPT_DIR")/端口映射关系.txt ${green}中${nc}"
@@ -64,12 +97,20 @@ get_u_com() {
             *'"public_ip"') u_external_address=$(echo "$line" | awk -F'["]' '{print $4}');;
         esac
     done < "$u_file"
-    show_u_com
-}
-
-# 函数:显示移动云手机极致版端口相关信息
-show_u_com() {
-    echo -e "云手机ip:\t$u_external_address\n内网端口:\t10000\t=====>\t公网端口:\t$u_external_aport_10000\n内网端口:\t10001\t=====>\t公网端口:\t$u_external_aport_10001\n内网端口:\t10002\t=====>\t公网端口:\t$u_external_aport_10002\n内网端口:\t10003\t=====>\t公网端口:\t$u_external_aport_10003\n内网端口:\t10004\t=====>\t公网端口:\t$u_external_aport_10004" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
+    
+    # 获取 IPv6 地址
+    u_ipv6_address=$(get_ipv6_address)
+    
+    # 记录端口映射及占用情况
+    port_mapping_info=""
+    for i in {0..4}; do
+        base_port=$((10000 + i))
+        port_status=$(get_port_occupation $base_port)
+        port_mapping_info+="内网端口:\t$base_port\t=====>\t公网端口:\t$((u_external_aport_10000 + i)) $port_status\n"
+    done
+    
+    # 输出解析结果到日志
+    echo -e "云手机ip:\t$u_external_address\nIPv6地址:\t$u_ipv6_address\n端口映射及占用情况:\n$port_mapping_info" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
     
     $echo_cmd -e "${green}更多端口映射关系已保存到 ${yellow}$(dirname "$SCRIPT_DIR")/端口映射关系.txt ${green}中${nc}"
 }
