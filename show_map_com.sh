@@ -25,13 +25,19 @@ detect_method_get_external_com() {
 
 # 函数:移动云手机获取公网端口
 get_n_com() {
-    # 使用 cat 和 awk 提取地址和端口信息
+    # 提取数据段落中的公网 IP 和端口信息
     result=$($cat_cmd "$n_file" | awk '/"aport":10000/ {print $0}' | tail -2)
     $echo_cmd -e "result:\n$result\n" >>"$INPUT_LOG"
     
     # 提取公网IP和端口号
-    n_external_address=$(echo "$result" | awk -F'["]' '/"address"/ {print $4}' | head -1)
-    n_external_aport=$(echo "$result" | awk -F'["]' '/"aport"/ {print $4}' | tail -1)
+    n_external_address=$(echo "$result" | awk -F'"external":{"address":"' '{print $2}' | awk -F'"' '{print $1}' | head -1)
+    n_external_aport=$(echo "$result" | awk -F'"aport":' '{print $2}' | awk -F',' '{print $1}' | tail -1)
+    
+    # 检查是否成功提取到正确的 IP 和端口
+    if [ -z "$n_external_address" ] || [ -z "$n_external_aport" ]; then
+        $echo_cmd -e "${yellow}未找到正确的公网 IP 或端口，请检查日志文件格式${nc}" >>"$INPUT_LOG"
+        exit 1
+    fi
     
     $echo_cmd -e "n_external_address:\n$n_external_address\nexternal_aport:\n$n_external_aport" >>"$INPUT_LOG"
     
@@ -41,6 +47,7 @@ get_n_com() {
     read -rp "按任意键退出"
     exit 0
 }
+
 
 # 函数:移动云手机极致版获取端口
 get_u_com() {
