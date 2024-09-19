@@ -8,16 +8,16 @@ for port in $(seq 10000 10004); do
 done
 
 # 记录端口映射信息到文件
-echo "--------------------------------" > //storage/emulated/0/Download//端口映射.txt
+echo "--------------------------------" > /storage/emulated/0/Download//端口映射.txt
 
 # 获取公网 IP 地址
 ipv4_address=$(curl -s --max-time 5 ip.sb -4)
 ipv6_address=$(curl -s --max-time 5 ip.sb -6)
 
 # 记录 IP 地址到文件
-[ -n "$ipv4_address" ] && echo "本机IPv4地址: $ipv4_address" >> //storage/emulated/0/Download//端口映射.txt
-[ -n "$ipv6_address" ] && echo "本机IPv6地址: $ipv6_address" >> //storage/emulated/0/Download//端口映射.txt
-echo "端口映射及占用情况: " >> //storage/emulated/0/Download//端口映射.txt
+[ -n "$ipv4_address" ] && echo "本机IPv4地址: $ipv4_address" >> /storage/emulated/0/Download//端口映射.txt
+[ -n "$ipv6_address" ] && echo "本机IPv6地址: $ipv6_address" >> /storage/emulated/0/Download//端口映射.txt
+echo "端口映射及占用情况: " >> /storage/emulated/0/Download//端口映射.txt
 
 # 基于内网 IP 地址的最后一段，计算公网端口偏移量
 mapped_port=$((10000 + ($(ifconfig wlan0 | grep 'inet ' | awk '{print $2}' | cut -d'.' -f4) - 2) * 5))
@@ -34,18 +34,19 @@ for i in $(seq 0 4); do
 
     if [ -n "$process" ]; then
         if [ "$process" = "busybox" ]; then
-            echo "$base_port → 公网端口 $actual_port 未被占用" >> //storage/emulated/0/Download//端口映射.txt
+            echo "$base_port → 公网端口 $actual_port 未被占用" >> /storage/emulated/0/Download//端口映射.txt
             # 杀掉所有 busybox 进程
             echo "正在杀掉所有 busybox 进程..."
             killall busybox
         else
-            echo "$base_port → 公网端口 $actual_port 被进程 $process 占用" >> //storage/emulated/0/Download//端口映射.txt
+            echo "$base_port → 公网端口 $actual_port 被进程 $process 占用" >> /storage/emulated/0/Download//端口映射.txt
         fi
     else
-        echo "$base_port → 公网端口 $actual_port 未被占用" >> //storage/emulated/0/Download//端口映射.txt
+        echo "$base_port → 公网端口 $actual_port 未被占用" >> /storage/emulated/0/Download//端口映射.txt
     fi
 done
 
 # 记录当前检测时间
-echo "-------检-测-时-间-------" >> //storage/emulated/0/Download//端口映射.txt
-date "+%Y-%m-%d %H:%M:%S" >> //storage/emulated/0/Download//端口映射.txt
+echo "-------检-测-时-间-------" >> /storage/emulated/0/Download//端口映射.txt
+date "+%Y-%m-%d %H:%M:%S" >> /storage/emulated/0/Download//端口映射.txt
+echo "--------------------------------" > /storage/emulated/0/Download//端口映射.txt
