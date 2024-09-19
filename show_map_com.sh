@@ -69,18 +69,18 @@ get_n_com() {
     for i in {0..4}; do
         base_port=$((10000 + i))
         port_status=$(get_port_occupation $base_port)
-        port_mapping_info+="内网端口:\t$base_port\t=====>\t公网端口:\t$((n_external_aport + i)) $port_status\n"
+        port_mapping_info+="内网端口: ${base_port} =====> 公网端口: $((n_external_aport + i)) ${port_status}\n"
     done
 
     # 输出解析结果到日志
-    $echo_cmd -e "云手机ip:\t$n_external_address\nIPv6地址:\t$n_ipv6_address\n端口映射及占用情况:\n$port_mapping_info" >>"$INPUT_LOG"
+    $echo_cmd -e "云手机ip: ${n_external_address}\nIPv6地址: ${n_ipv6_address}\n\n端口映射及占用情况:\n${port_mapping_info}\n-------检-测-时-间-------\n$(date "+%Y-%m-%d %H:%M:%S")" >>"$INPUT_LOG"
     
     # 保存端口映射信息到文件
-    echo -e "云手机ip:\t$n_external_address\nIPv6地址:\t$n_ipv6_address\n$port_mapping_info" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
+    echo -e "云手机ip: ${n_external_address}\nIPv6地址: ${n_ipv6_address}\n\n端口映射及占用情况:\n${port_mapping_info}\n\n-------检-测-时-间-------\n$(date "+%Y-%m-%d %H:%M:%S")" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
     
     # 显示保存成功的信息
     $echo_cmd -e "${green}更多端口映射关系已保存到 ${yellow}$(dirname "$SCRIPT_DIR")/端口映射关系.txt ${green}中${nc}"
-    read -rp "按任意键退出"
+    # read -rp "按任意键退出"
     exit 0
 }
 
@@ -106,11 +106,11 @@ get_u_com() {
     for i in {0..4}; do
         base_port=$((10000 + i))
         port_status=$(get_port_occupation $base_port)
-        port_mapping_info+="内网端口:\t$base_port\t=====>\t公网端口:\t$((u_external_aport_10000 + i)) $port_status\n"
+        port_mapping_info+="内网端口: ${base_port} =====> 公网端口: $((u_external_aport_10000 + i)) ${port_status}\n"
     done
     
     # 输出解析结果到日志
-    echo -e "云手机ip:\t$u_external_address\nIPv6地址:\t$u_ipv6_address\n端口映射及占用情况:\n$port_mapping_info" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
+    echo -e "云手机ip: ${u_external_address}\nIPv6地址: ${u_ipv6_address}\n\n端口映射及占用情况:\n${port_mapping_info}\n\n-------检-测-时-间-------\n$(date "+%Y-%m-%d %H:%M:%S")" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
     
     $echo_cmd -e "${green}更多端口映射关系已保存到 ${yellow}$(dirname "$SCRIPT_DIR")/端口映射关系.txt ${green}中${nc}"
 }
