@@ -1,60 +1,51 @@
-#!/bin/bash
+#!/system/bin/sh
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NC='\033[0m' # No Color
+# 开始监听 10000-10004 端口
+for port in $(seq 10000 10004); do
+  /data/adb/magisk/busybox nc -l -p $port >/dev/null &
+  pid=$!
+  echo "端口 $port 的进程PID为: $pid"
+done
 
-if [[ ! $(id -u) == '0' ]]; then
-    echo -e "${RED}ROOT?${NC}"
-    exit
-fi
+# 记录端口映射信息到文件
+echo "--------------------------------" > //storage/emulated/0/Download//端口映射.txt
 
-function install() {
-    pkill httpd
-    rm -rf /data/139
-    mkdir /data/139
-    wget -q -O /data/139/httpd "https://gitdl.cn/https://github.com/YYWO/CM139/releases/download/1.0/busybox"
-    chmod 777 /data/139/httpd
-    /data/139/httpd -p 10003
-    httpdstatus=$(ps -ef | grep httpd | grep -v grep | awk '{print $2}')
-    if [[ $httpdstatus ]]; then
-        echo -e "${GREEN} httpd 启动成功${NC}"
+# 获取公网 IP 地址
+ipv4_address=$(curl -s --max-time 5 ip.sb -4)
+ipv6_address=$(curl -s --max-time 5 ip.sb -6)
+
+# 记录 IP 地址到文件
+[ -n "$ipv4_address" ] && echo "本机IPv4地址: $ipv4_address" >> //storage/emulated/0/Download//端口映射.txt
+[ -n "$ipv6_address" ] && echo "本机IPv6地址: $ipv6_address" >> //storage/emulated/0/Download//端口映射.txt
+echo "端口映射及占用情况: " >> //storage/emulated/0/Download//端口映射.txt
+
+# 基于内网 IP 地址的最后一段，计算公网端口偏移量
+mapped_port=$((10000 + ($(ifconfig wlan0 | grep 'inet ' | awk '{print $2}' | cut -d'.' -f4) - 2) * 5))
+
+# 检查端口映射及占用情况，并添加公网端口映射
+for i in $(seq 0 4); do 
+    base_port=$((10000 + i))           # 内网端口
+    actual_port=$((mapped_port + i))   # 公网端口（内网端口+映射偏移值）
+    
+    # 检查内网端口是否被占用
+    process_info=$(netstat -tlnp 2>/dev/null | grep ":$base_port")
+    process=$(echo "$process_info" | awk '{sub(/[0-9]+\//, "", $NF); print $NF; exit}')
+    pid=$(echo "$process_info" | awk '{print $7}' | cut -d'/' -f1)
+
+    if [ -n "$process" ]; then
+        if [ "$process" = "busybox" ]; then
+            echo "$base_port → 公网端口 $actual_port 未被占用" >> //storage/emulated/0/Download//端口映射.txt
+            # 杀掉所有 busybox 进程
+            echo "正在杀掉所有 busybox 进程..."
+            killall busybox
+        else
+            echo "$base_port → 公网端口 $actual_port 被进程 $process 占用" >> //storage/emulated/0/Download//端口映射.txt
+        fi
     else
-        echo -e "${RED} httpd 启动失败${NC}"
-        uninstall
-        exit
-    fi
-}
-
-function uninstall() {
-    echo -e "${YELLOW}======回车删除环境======${NC}"
-    read
-    pkill httpd
-    rm -rf /data/139
-}
-
-echo -e "${YELLOW}========安装环境========${NC}"
-install
-ip=$(curl -s 4.ipw.cn)
-echo -e " 当前IP: ${GREEN}${ip}${NC}"
-echo " 开始探测端口"
-echo -e "${YELLOW}========等待一会========${NC}"
-for a in {000..999}; do
-    a="10${a}"
-    url="http://${ip}:${a}"
-    status=$(curl --connect-timeout 0.1 --max-time 0.1 -o /dev/null -s -w "%{http_code}" "${url}")
-    if [[ ${status} == '404' ]]; then
-        port=${a}
-        break
+        echo "$base_port → 公网端口 $actual_port 未被占用" >> //storage/emulated/0/Download//端口映射.txt
     fi
 done
-if [[ ${port} ]]; then
-    echo -e " 端口：10002 ———— ${GREEN}$((${port} - 1))${NC}"
-    echo -e " 端口：10003 ———— ${GREEN}${port}${NC}"
-    echo -e " 端口：10004 ———— ${GREEN}$((${port} + 1))${NC}"
-else
-    echo '========================'
-    echo -e "${RED}未找到可用端口${NC}"
-fi
-uninstall
+
+# 记录当前检测时间
+echo "-------检-测-时-间-------" >> //storage/emulated/0/Download//端口映射.txt
+date "+%Y-%m-%d %H:%M:%S" >> //storage/emulated/0/Download//端口映射.txt
