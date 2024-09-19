@@ -1,9 +1,8 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")") # 获取当前路径
-export LD_LIBRARY_PATH=$SCRIPT_DIR/../lib:${LD_LIBRARY_PATH:-}
-INPUT_LOG="$SCRIPT_DIR/../logs/getcom/log_$(date '+%Y-%m-%d_%H-%M-%S').log"
-mkdir -p "$SCRIPT_DIR/../logs/getcom"
+INPUT_LOG="$SCRIPT_DIR/./logs/getcom/log_$(date '+%Y-%m-%d_%H-%M-%S').log"
+mkdir -p "$SCRIPT_DIR/./logs/getcom"
 exec > >(tee -a "$INPUT_LOG") 2>&1
 
 cat_cmd="/bin/cat"  # 使用系统自带的 cat 命令
@@ -70,7 +69,7 @@ get_u_com() {
 
 # 函数:显示移动云手机极致版端口相关信息
 show_u_com() {
-    echo -e "云手机ip:\t$u_external_address\n内网端口:\t10000\t=====>\t公网端口:\t$u_external_aport_10000\n内网端口:\t10001\t=====>\t公网端口:\t$u_external_aport_10001\n内网端口:\t10002\t=====>\t公网端口:\t$u_external_aport_10002\n内网端口:\t10003\t=====>\t公网端口:\t$u_external_aport_10003\n内网端口:\t10004\t=====>\t公网端口:\t$u_external_aport_10004" | tee "$SCRIPT_DIR/../端口映射关系.txt" | tee -a "$INPUT_LOG"
+    echo -e "云手机ip:\t$u_external_address\n内网端口:\t10000\t=====>\t公网端口:\t$u_external_aport_10000\n内网端口:\t10001\t=====>\t公网端口:\t$u_external_aport_10001\n内网端口:\t10002\t=====>\t公网端口:\t$u_external_aport_10002\n内网端口:\t10003\t=====>\t公网端口:\t$u_external_aport_10003\n内网端口:\t10004\t=====>\t公网端口:\t$u_external_aport_10004" | tee "$SCRIPT_DIR/./端口映射关系.txt" | tee -a "$INPUT_LOG"
     
     $echo_cmd -e "${green}更多端口映射关系已保存到 ${yellow}$(dirname "$SCRIPT_DIR")/端口映射关系.txt ${green}中${nc}"
 }
